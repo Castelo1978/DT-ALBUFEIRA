@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Gerador de Autos</title>
+<style>
+body {
+    font-family: Arial;
+    background: #1e1e1e;
+    color: white;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    width: 1120px;
+    background: #2b2b2b;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+h2 { text-align: center; margin: 5px 0; }
+
+input, select {
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+    background: #fff;
+    color: black;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+    min-height: 38px;
+}
+input:disabled, select:disabled {
+    background: #888;
+    color: #eee;
+}
+button {
+    padding: 12px;
+    margin: 5px 0;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.copiar {
+    background:#007bff;
+    width:100%;
+    color:white;
+}
+.codigo-box {
+    margin-top:10px;
+    background:#111;
+    padding:10px;
+    border-radius:5px;
+    display:flex;
+    flex-direction: column;
+    gap:5px;
+}
+#codigo, #coima {
+    width:100%;
+    padding:8px;
+    border-radius:5px;
+    border:none;
+    background:#222;
+    color:white;
+    box-sizing: border-box;
+}
+#output {
+    margin-top:10px;
+    background:#111;
+    padding:10px;
+    border-radius:5px;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    min-height: 90px;
+}
+.topo-imagens {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin: 10px 0;
+}
+.datahora-box {
+    width: 190px;
+    min-height: 120px;
+    background: #111;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 12px;
+    box-sizing: border-box;
+    text-align: center;
+    border: 1px solid #444;
+}
+.datahora-box .titulo {
+    font-size: 13px;
+    color: #ccc;
+    margin-bottom: 8px;
+}
+.datahora-box .data {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+}
+.datahora-box .hora {
+    font-size: 24px;
+    font-weight: bold;
+    color: #28a745;
+    margin-top: 4px;
+}
+.imagens {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 10px 0;
+}
+.imagens img {
+    width: 100px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+.linha {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 120px;
+    justify-content: flex-end;
+}
+.campo label {
+    font-size: 13px;
+    color: #ddd;
+    font-weight: bold;
+    min-height: 16px;
+}
+.campo.flex1 { flex: 1; }
+.campo.flex15 { flex: 1.5; }
+.campo.flex2 { flex: 2; }
+.campo.flex25 { flex: 2.5; }
+.campo.flex3 { flex: 3; }
+
+.linha-radar .campo {
+    justify-content: flex-start;
+}
+.linha-radar .campo label {
+    min-height: 16px;
+}
+.linha-radar .campo > select,
+.linha-radar .campo > input {
+    min-height: 38px;
+}
+
+.amarelo {
+    background: #ffc107 !important;
+    color: black !important;
+    font-weight: bold;
+}
+.cinzento {
+    background: #888 !important;
+    color: #f1f1f1 !important;
+    font-weight: bold;
+}
+.verde-campo {
+    background: #28a745 !important;
+    color: white !important;
+    font-weight: bold;
+}
+.vermelho-campo {
+    background: #dc3545 !important;
+    color: white !important;
+    font-weight: bold;
+}
+.laranja-campo {
+    background: #fd7e14 !important;
+    color: white !important;
+    font-weight: bold;
+}
+.radar-amarelo {
+    background: #ffc107 !important;
+    color: black !important;
+    font-weight: bold;
+}
+.checkbox-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #3a3a3a;
+    padding: 8px 10px;
+    border-radius: 5px;
+    height: 38px;
+    box-sizing: border-box;
+}
+.checkbox-wrap input[type="checkbox"] {
+    width: auto;
+    transform: scale(1.2);
+    min-height: auto;
+}
+.checkbox-wrap.disabled {
+    background: #888 !important;
+    color: #eee !important;
+    cursor: not-allowed;
+}
+hr {
+    border: none;
+    border-top: 1px solid #555;
+    margin: 15px 0;
+}
+.alerta-verificacao {
+    margin-top: 8px;
+    background: #5a1b1b;
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    display: none;
+    font-weight: bold;
+    text-align: center;
+}
+#estadoRadarTexto {
+    font-size: 13px;
+    font-weight: bold;
+    margin-left: 8px;
+}
+.estado-verde { color: #28a745; }
+.estado-amarelo { color: #ffc107; }
+.estado-laranja { color: #fd7e14; }
+.estado-vermelho { color: #dc3545; }
+
+#limite {
+    background: #dc3545 !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+#toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-weight: bold;
+    display: none;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>DESTACAMENTO TRÂNSITO ALBUFEIRA</h2>
+    <h2>EQUIPA DE APARELHOS ESPECIAIS</h2>
+    <p style="text-align:center; font-weight:bold; color:green">Jorge Castelo GP/2000182</p>
+
+    <div class="topo-imagens">
+        <div class="datahora-box">
+            <div class="titulo">Data e Hora</div>
+            <div class="data" id="dataAtual">--/--/----</div>
+            <div class="hora" id="horaAtual">--:--:--</div>
+        </div>
+
+        <div class="imagens">
+            <img src="https://segurancaecienciasforenses.com/wp-content/uploads/2013/12/bt.jpg">
+            <img src="https://pplware.sapo.pt/wp-content/uploads/2025/01/radar_1.jpg">
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="linha">
+        <div class="campo flex3">
+            <label>Veículo</label>
+            <select id="tipoVeiculo" onchange="atualizarEstadoCamposVia(); atualizarVelocidadePermitida(); gerar();">
+                <option value="ligeiro_passageiros_sem_reboque" selected>Automóveis ligeiros de passageiros e mistos sem reboque</option>
+                <option value="ligeiro_mercadorias_sem_reboque">Automóveis ligeiros de mercadorias sem reboque</option>
+                <option value="pesado_passageiros_sem_reboque">Automóveis pesados de passageiros sem reboque</option>
+                <option value="pesado_passageiros_com_reboque">Automóveis pesados de passageiros com reboque</option>
+                <option value="pesado_mercadorias_semireboque">Automóveis pesados de mercadorias sem reboque ou com semi-reboque</option>
+                <option value="pesado_mercadorias_com_reboque">Automóveis pesados de mercadorias com reboque</option>
+                <option value="motociclo_sup_50_sem_carro">Motociclos superior a 50 cm3 sem carro lateral</option>
+                <option value="motociclo_com_carro_ou_reboque">Motociclos com carro lateral ou com reboque</option>
+                <option value="motociclo_ate_50">Motociclos de cilindrada não superior a 50 cm3</option>
+                <option value="ligeiro_passageiros_com_reboque">Automóveis ligeiros de passageiros e mistos com reboque</option>
+                <option value="ligeiro_mercadorias_com_reboque">Automóveis ligeiros de mercadorias com reboque</option>
+                <option value="ciclomotor_quadriciclo">Ciclomotores e Quadriciclos</option>
+                <option value="triciclo">Triciclos</option>
+                <option value="tractor_agricola_florestal">Tractores agrícolas ou florestais</option>
+                <option value="maquina_agricola">Máquinas agrícolas, motocultivadores e tractocarros</option>
+                <option value="maquina_industrial_sem_matricula">Máquinas industriais sem matrícula</option>
+                <option value="maquina_industrial_com_matricula">Máquinas industriais com matrícula</option>
+            </select>
+        </div>
+
+        <div class="campo flex1">
+            <label>Local</label>
+            <select id="localidade" onchange="atualizarEstadoCamposVia(); atualizarVelocidadePermitida(); gerar();">
+                <option selected>Fora de localidade</option>
+                <option>Dentro de localidade</option>
+            </select>
+        </div>
+
+        <div class="campo flex1">
+            <label>Estrada</label>
+            <select id="estrada" onchange="atualizarVelocidadePermitida(); gerar();">
+                <option value="" selected>Selecionar</option>
+                <option value="EN">Estrada Nacional</option>
+                <option value="A">A22/A2</option>
+                <option value="IC">IC1/IC17</option>
+            </select>
+        </div>
+
+        <div class="campo flex1">
+            <label>Entre Placas</label>
+            <div class="checkbox-wrap" id="entrePlacasWrap">
+                <input type="checkbox" id="entrePlacas" onchange="atualizarEstadoCamposVia(); atualizarVelocidadePermitida(); gerar();">
+                <span>Sinalização</span>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="linha linha-radar">
+        <div class="campo flex1">
+            <label>Radar <span id="estadoRadarTexto"></span></label>
+            <select id="radar" onchange="controlarCamposRadar(); gerar();">
+                <option>MUVR 6F</option>
+                <option>Trucam</option>
+                <option selected>Vitronic</option>
+                <option>Multaradar C</option>
+            </select>
+        </div>
+
+        <div class="campo flex1">
+            <label>Tipo de Verificação</label>
+            <select id="tipoVerificacao" onchange="gerar();">
+                <option value="primeira">1ª Verificação</option>
+                <option value="periodica">Verificação Periódica</option>
+            </select>
+        </div>
+
+        <div class="campo flex1">
+            <label>Nº Ficheiro</label>
+            <input id="ficheiro" oninput="gerar();" placeholder="Nº Ficheiro✍️">
+        </div>
+
+        <div class="campo flex1">
+            <label>Nº Foto</label>
+            <input id="foto" oninput="gerar();" placeholder="📸 Nº Foto✍️">
+        </div>
+    </div>
+
+    <div id="mensagemVerificacao" class="alerta-verificacao">Necessita ser submetido à Verificação</div>
+
+    <hr>
+
+    <div class="linha">
+        <div class="campo flex1">
+            <label>Velocidade Registada</label>
+            <input id="vel_reg" class="amarelo" oninput="gerar();" placeholder="Velocidade Registada✍️">
+        </div>
+
+        <div class="campo flex1">
+            <label>Velocidade com desconto</label>
+            <input id="vel_calc" class="cinzento" readonly placeholder="Velocidade com desconto">
+        </div>
+
+        <div class="campo flex1">
+            <label>Velocidade Permitida Local</label>
+            <input id="limite" readonly value="0" placeholder="Velocidade Permitida">
+        </div>
+
+        <div class="campo flex15">
+            <label>Operador</label>
+            <select id="operador" onchange="gerar()">
+                <option>20/1960400-Gregório</option>
+                <option>456/1960616-Alves</option>
+                <option>417/1940567-Silva</option>
+                <option>583/1950835-Paradinha</option>
+                <option>850/2000713-Silva</option>
+                <option selected>833/2000182-Castelo</option>
+            </select>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="codigo-box">
+        <input id="codigo" placeholder="Código de Infração" readonly>
+        <div id="coima"></div>
+        <button onclick="copiarCodigo()">📋 Copiar Código</button>
+    </div>
+
+    <button class="copiar" onclick="copiarDescricao()">📋 Copiar Descrição</button>
+
+    <div id="output"></div>
+
+    <div id="ultimaAtualizacao" style="text-align:center; margin-top:10px; color:#ccc; font-size:12px;">
+        Última atualização: 10/04/2026 - Versão 2.1
+    </div>
+</div>
+
+<div id="toast">Copiado!</div>
+
+<script>
+const VEICULO_BASE = "ligeiro_passageiros_sem_reboque";
+
+const tabelaVelocidades = {
+    ciclomotor_quadriciclo: { dentro: 40, autoestrada: null, viareservada: null, restantes: 45 },
+    motociclo_sup_50_sem_carro: { dentro: 50, autoestrada: 120, viareservada: 100, restantes: 90 },
+    motociclo_com_carro_ou_reboque: { dentro: 50, autoestrada: 100, viareservada: 80, restantes: 70 },
+    motociclo_ate_50: { dentro: 40, autoestrada: null, viareservada: null, restantes: 60 },
+    triciclo: { dentro: 50, autoestrada: 100, viareservada: 90, restantes: 80 },
+    ligeiro_passageiros_sem_reboque: { dentro: 50, autoestrada: 120, viareservada: 100, restantes: 90 },
+    ligeiro_passageiros_com_reboque: { dentro: 50, autoestrada: 100, viareservada: 80, restantes: 70 },
+    ligeiro_mercadorias_sem_reboque: { dentro: 50, autoestrada: 110, viareservada: 90, restantes: 80 },
+    ligeiro_mercadorias_com_reboque: { dentro: 50, autoestrada: 90, viareservada: 80, restantes: 70 },
+    pesado_passageiros_sem_reboque: { dentro: 50, autoestrada: 100, viareservada: 90, restantes: 80 },
+    pesado_passageiros_com_reboque: { dentro: 50, autoestrada: 90, viareservada: 90, restantes: 70 },
+    pesado_mercadorias_semireboque: { dentro: 50, autoestrada: 90, viareservada: 80, restantes: 80 },
+    pesado_mercadorias_com_reboque: { dentro: 40, autoestrada: 80, viareservada: 70, restantes: 70 },
+    tractor_agricola_florestal: { dentro: 30, autoestrada: null, viareservada: null, restantes: 40 },
+    maquina_agricola: { dentro: 20, autoestrada: null, viareservada: null, restantes: 20 },
+    maquina_industrial_sem_matricula: { dentro: 30, autoestrada: null, viareservada: null, restantes: 30 },
+    maquina_industrial_com_matricula: { dentro: 40, autoestrada: 80, viareservada: 70, restantes: 70 }
+};
+
+const radares = {
+    "MUVR 6F": {
+        tipoVerificacao: "primeira",
+        dataVerificacao: "2025-03-20",
+        bloqueiaFichaFoto: false,
+        descricao: "A velocidade foi verificada através do cinemómetro radar fotográfico Multanova MUVR-6FD Nº05-06-2629, aprovado para controlo e fiscalização pela ANSR através do despacho nº 1863/2014 e pelo IPQ através do despacho aprovação n.º 8334/2012 de Modelo nº 111.20.12.3.09, verificado pelo IPQ em 20/03/2025, com Certificado de Primeira Verificação nº 11122/2526732311."
+    },
+    "Trucam": {
+        tipoVerificacao: "primeira",
+        dataVerificacao: "2025-11-13",
+        bloqueiaFichaFoto: true,
+        descricao: "A velocidade foi verificada através do cinemómetro Lidar Laser Technology Inc, modelo LTI 20/20 TruCam II n.º TC008053, aprovado para controlo e fiscalização pela ANSR através do despacho nº 7869/2020 e pelo IPQ através do despacho de aprovação n.º 5304/2020 de Modelo nº111.24.19.3.44, verificado pelo IPQ em 13/11/2025, com Certificado de Primeira Verificação nº 11124/2526733417."
+    },
+    "Vitronic": {
+        tipoVerificacao: "primeira",
+        dataVerificacao: "2025-10-30",
+        bloqueiaFichaFoto: true,
+        descricao: "A velocidade foi verificada através aparelho cinemómetro Lidar Vitronic, modelo PoliScan FM1-2 n.º 767709, aprovado para controlo e fiscalização pela ANSR através do despacho nº 7021/19 e pelo IPQ através despacho de aprovação n.º 1863/19 de Modelo nº 111.24.18.3.28. Verificado pelo IPQ em 30/10/2025, com Certificado de Primeira Verificação nº 11124/2526733235."
+    },
+    "Multaradar C": {
+        tipoVerificacao: "primeira",
+        dataVerificacao: "2025-04-10",
+        bloqueiaFichaFoto: false,
+        descricao: "A velocidade foi verificada através do cinemómetro radar Jenoptik, modelo MultaRadar C n.º 504-330/63316, estacionado, aprovado para controlo e fiscalização pela ANSR através do despacho nº 5896/2021 e pelo IPQ através de despacho de aprovação n.º 4573/2021 de Modelo n.º 111.20.21.3.31, verificado pelo IPQ em 10/04/2025, com Certificado de Primeira Verificação nº 11121/2526732586."
+    }
+};
+
+function atualizarDataHora() {
+    const agora = new Date();
+    const dia = String(agora.getDate()).padStart(2, '0');
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const ano = agora.getFullYear();
+    const horas = String(agora.getHours()).padStart(2, '0');
+    const minutos = String(agora.getMinutes()).padStart(2, '0');
+    const segundos = String(agora.getSeconds()).padStart(2, '0');
+
+    document.getElementById("dataAtual").innerText = `${dia}/${mes}/${ano}`;
+    document.getElementById("horaAtual").innerText = `${horas}:${minutos}:${segundos}`;
+}
+
+function obterTipoEstrada() {
+    let estrada = document.getElementById("estrada").value;
+
+    if (!estrada) return { chave: null };
+    if (estrada === "A") return { chave: "autoestrada" };
+    return { chave: "restantes" };
+}
+
+function atualizarEstadoCamposVia() {
+    const local = document.getElementById("localidade").value;
+    const entrePlacas = document.getElementById("entrePlacas");
+    const entrePlacasWrap = document.getElementById("entrePlacasWrap");
+    const estrada = document.getElementById("estrada");
+
+    if (local === "Dentro de localidade") {
+        estrada.value = "";
+        estrada.disabled = true;
+        estrada.classList.add("cinzento");
+
+        entrePlacas.checked = false;
+        entrePlacas.disabled = true;
+        entrePlacasWrap.classList.add("disabled");
+        return;
+    }
+
+    entrePlacas.disabled = false;
+    entrePlacasWrap.classList.remove("disabled");
+
+    if (entrePlacas.checked) {
+        estrada.value = "";
+        estrada.disabled = true;
+        estrada.classList.add("cinzento");
+    } else {
+        estrada.disabled = false;
+        estrada.classList.remove("cinzento");
+    }
+}
+
+function atualizarVelocidadePermitida() {
+    let veiculo = document.getElementById("tipoVeiculo").value;
+    let local = document.getElementById("localidade").value;
+    let placas = document.getElementById("entrePlacas").checked;
+    let infoEstrada = obterTipoEstrada();
+    let campoLimite = document.getElementById("limite");
+    let estradaTexto = document.getElementById("estrada").value;
+
+    if (placas) {
+        campoLimite.readOnly = false;
+        campoLimite.disabled = false;
+        if (campoLimite.value === "" || campoLimite.value === null) campoLimite.value = "0";
+        return;
+    }
+
+    campoLimite.readOnly = true;
+    campoLimite.disabled = false;
+
+    if (local === "Dentro de localidade") {
+        campoLimite.value = tabelaVelocidades[veiculo].dentro ?? 50;
+        return;
+    }
+
+    if (local === "Fora de localidade" && !estradaTexto) {
+        campoLimite.value = 0;
+        return;
+    }
+
+    if (local === "Fora de localidade" && !infoEstrada.chave) {
+        campoLimite.value = 0;
+        return;
+    }
+
+    let limite = tabelaVelocidades[veiculo][infoEstrada.chave];
+    campoLimite.value = (limite === null || limite === undefined) ? 0 : limite;
+}
+
+function adicionarMeses(data, meses) {
+    const nova = new Date(data);
+    const diaOriginal = nova.getDate();
+    nova.setMonth(nova.getMonth() + meses);
+    if (nova.getDate() < diaOriginal) {
+        nova.setDate(0);
+    }
+    return nova;
+}
+
+function diasRestantes(dataFim) {
+    const hoje = new Date();
+    hoje.setHours(0,0,0,0);
+
+    const diff = dataFim - hoje;
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function obterEstadoRadar() {
+    const radarSelecionado = document.getElementById("radar").value;
+    const radar = radares[radarSelecionado];
+
+    const hoje = new Date();
+    hoje.setHours(0,0,0,0);
+
+    const dataVerificacao = new Date(radar.dataVerificacao + "T00:00:00");
+    const limite9 = adicionarMeses(dataVerificacao, 9);
+    const limite11 = adicionarMeses(dataVerificacao, 11);
+    const limite12 = adicionarMeses(dataVerificacao, 12);
+
+    if (hoje > limite12) return "vermelho";
+    if (hoje > limite11 && hoje <= limite12) return "laranja";
+    if (hoje > limite9 && hoje <= limite11) return "amarelo";
+    return "verde";
+}
+
+function radarEstaValido() {
+    return obterEstadoRadar() !== "vermelho";
+}
+
+function aplicarEstadoRadar() {
+    const radarSelecionado = document.getElementById("radar").value;
+    const radar = radares[radarSelecionado];
+    const radarField = document.getElementById("radar");
+    const tipoVerificacao = document.getElementById("tipoVerificacao");
+    const mensagem = document.getElementById("mensagemVerificacao");
+    const estadoTexto = document.getElementById("estadoRadarTexto");
+    const estado = obterEstadoRadar();
+
+    const dataVerificacao = new Date(radar.dataVerificacao + "T00:00:00");
+    const limite12 = adicionarMeses(dataVerificacao, 12);
+
+    radarField.classList.remove("verde-campo", "vermelho-campo", "laranja-campo", "radar-amarelo");
+    estadoTexto.className = "";
+    estadoTexto.removeAttribute("class");
+
+    tipoVerificacao.value = radar.tipoVerificacao;
+    tipoVerificacao.disabled = true;
+    tipoVerificacao.classList.add("cinzento");
+
+    if (estado === "verde") {
+        radarField.classList.add("verde-campo");
+        estadoTexto.innerText = "Válido";
+        estadoTexto.classList.add("estado-verde");
+        mensagem.style.display = "none";
+    } else if (estado === "amarelo") {
+        radarField.classList.add("radar-amarelo");
+        estadoTexto.innerText = "A terminar";
+        estadoTexto.classList.add("estado-amarelo");
+        mensagem.style.display = "none";
+    } else if (estado === "laranja") {
+        radarField.classList.add("laranja-campo");
+
+        const dias = diasRestantes(limite12);
+
+        if (dias <= 1) {
+            estadoTexto.innerText = "⚠ Último dia";
+        } else {
+            estadoTexto.innerText = `⚠ ${dias} dias`;
+        }
+
+        estadoTexto.classList.add("estado-laranja");
+        mensagem.style.display = "none";
+    } else {
+        radarField.classList.add("vermelho-campo");
+        estadoTexto.innerText = "Caducado";
+        estadoTexto.classList.add("estado-vermelho");
+        mensagem.style.display = "block";
+    }
+
+    return estado;
+}
+
+function bloquearCamposSeRadarCaducado() {
+    const valido = radarEstaValido();
+
+    const tipoVeiculo = document.getElementById("tipoVeiculo");
+    const localidade = document.getElementById("localidade");
+    const estrada = document.getElementById("estrada");
+    const entrePlacas = document.getElementById("entrePlacas");
+    const ficheiro = document.getElementById("ficheiro");
+    const foto = document.getElementById("foto");
+    const velReg = document.getElementById("vel_reg");
+    const operador = document.getElementById("operador");
+    const limite = document.getElementById("limite");
+
+    if (!valido) {
+        tipoVeiculo.disabled = true;
+        localidade.disabled = true;
+        estrada.disabled = true;
+        entrePlacas.disabled = true;
+        ficheiro.disabled = true;
+        foto.disabled = true;
+        velReg.disabled = true;
+        operador.disabled = true;
+        limite.disabled = true;
+
+        ficheiro.style.background = "#888";
+        foto.style.background = "#888";
+
+        document.getElementById("output").innerText = "";
+        document.getElementById("codigo").value = "";
+        document.getElementById("coima").innerText = "";
+        document.getElementById("vel_calc").value = "";
+        return;
+    }
+
+    tipoVeiculo.disabled = false;
+    localidade.disabled = false;
+    velReg.disabled = false;
+    operador.disabled = false;
+    limite.disabled = false;
+
+    atualizarEstadoCamposVia();
+    atualizarVelocidadePermitida();
+    controlarCamposFichaFoto();
+}
+
+function controlarCamposFichaFoto() {
+    const radarSelecionado = document.getElementById("radar").value;
+    const radar = radares[radarSelecionado];
+    const ficheiro = document.getElementById("ficheiro");
+    const foto = document.getElementById("foto");
+
+    if (!radarEstaValido()) {
+        ficheiro.disabled = true;
+        foto.disabled = true;
+        ficheiro.style.background = "#888";
+        foto.style.background = "#888";
+        return;
+    }
+
+    if (radarSelecionado === "MUVR 6F" || radarSelecionado === "Multaradar C") {
+        ficheiro.disabled = false;
+        foto.disabled = false;
+        ficheiro.style.background = "#fff";
+        foto.style.background = "#fff";
+        return;
+    }
+
+    ficheiro.disabled = true;
+    foto.disabled = true;
+    ficheiro.style.background = "#888";
+    foto.style.background = "#888";
+}
+
+function controlarCamposRadar() {
+    aplicarEstadoRadar();
+    bloquearCamposSeRadarCaducado();
+    controlarCamposFichaFoto();
+}
+
+function calcularVelDesconto() {
+    let vel = parseFloat(document.getElementById("vel_reg").value.replace(",", "."));
+    if (isNaN(vel)) {
+        document.getElementById("vel_calc").value = "";
+        return;
+    }
+
+    const radarSelecionado = document.getElementById("radar").value;
+    const radar = radares[radarSelecionado];
+    const tipo = radar.tipoVerificacao;
+
+    let velFinal = 0;
+
+    if (tipo === "primeira") {
+        if (vel <= 100) velFinal = vel - 3;
+        else velFinal = Math.floor(vel * 0.97);
+    } else {
+        if (vel <= 100) velFinal = vel - 5;
+        else velFinal = Math.floor(vel * 0.95);
+    }
+
+    document.getElementById("vel_calc").value = Math.floor(velFinal);
+}
+
+function getGrupoVeiculoInfracao() {
+    const v = document.getElementById("tipoVeiculo").value;
+
+    const grupoLigeiro = [
+        "motociclo_sup_50_sem_carro",
+        "motociclo_com_carro_ou_reboque",
+        "motociclo_ate_50",
+        "triciclo",
+        "ligeiro_passageiros_sem_reboque",
+        "ligeiro_passageiros_com_reboque",
+        "ligeiro_mercadorias_sem_reboque",
+        "ligeiro_mercadorias_com_reboque"
+    ];
+
+    if (grupoLigeiro.includes(v)) return "ligeiro";
+    return "pesado";
+}
+
+function calcularCodigo() {
+    let vel = parseInt(document.getElementById("vel_calc").value);
+    let lim = parseInt(document.getElementById("limite").value);
+
+    if (isNaN(vel) || isNaN(lim) || lim <= 0) {
+        document.getElementById("codigo").value = "";
+        document.getElementById("coima").innerText = "";
+        return;
+    }
+
+    let excesso = vel - lim;
+    if (excesso <= 0) {
+        document.getElementById("codigo").value = "";
+        document.getElementById("coima").innerText = "";
+        return;
+    }
+
+    let local = document.getElementById("localidade").value;
+    let placas = document.getElementById("entrePlacas").checked;
+    let tipoVeiculo = getGrupoVeiculoInfracao();
+
+    let codigo = "";
+    let coima = "";
+
+    if (tipoVeiculo === "ligeiro") {
+        if (!placas) {
+            if (local === "Dentro de localidade") {
+                if (excesso <= 20) { codigo = "1860270109"; coima = "Coima mínima: 60€ | Leve"; }
+                else if (excesso <= 40) { codigo = "2860270110"; coima = "Coima mínima: 120€ | Grave"; }
+                else if (excesso <= 60) { codigo = "3860270111"; coima = "Coima mínima: 300€ | Muito Grave"; }
+                else { codigo = "3860270112"; coima = "Coima mínima: 500€ | Muito Grave"; }
+            } else {
+                if (excesso <= 30) { codigo = "1860270113"; coima = "Coima mínima: 60€ | Leve"; }
+                else if (excesso <= 60) { codigo = "2860270114"; coima = "Coima mínima: 120€ | Grave"; }
+                else if (excesso <= 80) { codigo = "3860270115"; coima = "Coima mínima: 300€ | Muito Grave"; }
+                else { codigo = "3860270116"; coima = "Coima mínima: 500€ | Muito Grave"; }
+            }
+        } else {
+            if (local === "Dentro de localidade") {
+                if (excesso <= 20) { codigo = "1860280106"; coima = "Coima mínima: 60€ | Leve"; }
+                else if (excesso <= 40) { codigo = "2860280107"; coima = "Coima mínima: 120€ | Grave"; }
+                else if (excesso <= 60) { codigo = "3860280108"; coima = "Coima mínima: 300€ | Muito Grave"; }
+                else { codigo = "3860280109"; coima = "Coima mínima: 500€ | Muito Grave"; }
+            } else {
+                if (excesso <= 30) { codigo = "1860280110"; coima = "Coima mínima: 60€ | Leve"; }
+                else if (excesso <= 60) { codigo = "2860280111"; coima = "Coima mínima: 120€ | Grave"; }
+                else if (excesso <= 80) { codigo = "3860280112"; coima = "Coima mínima: 300€ | Muito Grave"; }
+                else { codigo = "3860280113"; coima = "Coima mínima: 500€ | Muito Grave"; }
+            }
+        }
+    }
+
+    if (tipoVeiculo === "pesado") {
+        if (!placas) {
+            if (local === "Dentro de localidade") {
+                if (excesso <= 10) { codigo = "1860270117"; coima = "Coima mínima: 60€ | Leve"; }
+                else if (excesso <= 20) { codigo = "2860270118"; coima = "Coima mínima: 120€ | Grave"; }
+                else if (excesso <= 40) { codigo = "3860270119"; coima = "Coima mínima: 300€ | Muito Grave"; }
+                else { codigo = "3860270120"; coima = "Coima mínima: 500€ | Muito Grave"; }
+            } else {
+                if (excesso <= 20) { codigo = "1860270121"; coima = "Coima mínima: 60€ | Leve"; }
+                else if (excesso <= 40) { codigo = "2860270122"; coima = "Coima mínima: 120€ | Grave"; }
+                else if (excesso <= 60) { codigo = "3860270123"; coima = "Coima mínima: 300€ | Muito Grave"; }
+                else { codigo = "3860270124"; coima = "Coima mínima: 500€ | Muito Grave"; }
+            }
+        } else {
+            if (local === "Dentro de localidade") {
+                if (excesso <= 10) { codigo = "1860280118"; coima = "Coima mínima: 60€ | Leve"; }
+                else if (excesso <= 20) { codigo = "2860280119"; coima = "Coima mínima: 120€ | Grave"; }
+                else if (excesso <= 40) { codigo = "3860280120"; coima = "Coima mínima: 300€ | Muito Grave"; }
+                else { codigo = "3860280121"; coima = "Coima mínima: 500€ | Muito Grave"; }
+            } else {
+                if (excesso <= 20) { codigo = "1860280122"; coima = "Coima mínima: 60€ | Leve"; }
+                else if (excesso <= 40) { codigo = "2860280123"; coima = "Coima mínima: 120€ | Grave"; }
+                else if (excesso <= 60) { codigo = "3860280124"; coima = "Coima mínima: 300€ | Muito Grave"; }
+                else { codigo = "3860280125"; coima = "Coima mínima: 500€ | Muito Grave"; }
+            }
+        }
+    }
+
+    document.getElementById("codigo").value = codigo;
+    document.getElementById("coima").innerText = coima;
+}
+
+function obterComplementoLimiteDescricao() {
+    const local = document.getElementById("localidade").value;
+    const placas = document.getElementById("entrePlacas").checked;
+    const veiculo = document.getElementById("tipoVeiculo").value;
+    const infoEstrada = obterTipoEstrada();
+
+    if (placas) return ", imposto por sinalização";
+    if (local !== "Fora de localidade") return "";
+    if (!infoEstrada.chave) return "";
+
+    const limiteBase = tabelaVelocidades[VEICULO_BASE][infoEstrada.chave];
+    const limiteAtual = tabelaVelocidades[veiculo][infoEstrada.chave];
+
+    if (limiteAtual !== limiteBase) {
+        return ", para o tipo de veículo";
+    }
+
+    return "";
+}
+
+function gerar() {
+    atualizarEstadoCamposVia();
+    atualizarVelocidadePermitida();
+    controlarCamposRadar();
+
+    if (!radarEstaValido()) {
+        document.getElementById("output").innerText = "";
+        document.getElementById("codigo").value = "";
+        document.getElementById("coima").innerText = "";
+        document.getElementById("vel_calc").value = "";
+        return;
+    }
+
+    calcularVelDesconto();
+    calcularCodigo();
+
+    let loc = document.getElementById("localidade").value.toLowerCase();
+    let velc = document.getElementById("vel_calc").value;
+    let velr = document.getElementById("vel_reg").value;
+    let lim = document.getElementById("limite").value;
+    let radarNome = document.getElementById("radar").value;
+    let op = document.getElementById("operador").value;
+    let fich = document.getElementById("ficheiro").value;
+    let foto = document.getElementById("foto").value;
+    let radar = radares[radarNome];
+
+    if (!lim || parseInt(lim) <= 0) {
+        document.getElementById("output").innerText = "";
+        return;
+    }
+
+    const complementoLimite = obterComplementoLimiteDescricao();
+
+    let base = `O referido veículo circulava, ${loc}, pelo menos, à velocidade ${velc} Km/h, correspondente à velocidade registada ${velr} Km/h, deduzido o valor do erro máximo admissível, sendo o limite máximo de velocidade permitido no local ${lim} Km/h${complementoLimite}. `;
+
+    let texto = base + radar.descricao;
+
+    if (!radar.bloqueiaFichaFoto) {
+        if (fich) texto += ` Fch. Nº ${fich};`;
+        if (foto) texto += ` Ft. ${foto};`;
+    }
+
+    texto += ` Op. ${op}.`;
+
+    document.getElementById("output").innerText = texto;
+}
+
+function somClique() {
+    const audio = new Audio("https://www.soundjay.com/buttons/sounds/button-16.mp3");
+    audio.play();
+}
+
+function mostrarToast(texto) {
+    const toast = document.getElementById("toast");
+    toast.innerText = texto;
+    toast.style.display = "block";
+
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 1500);
+}
+
+function copiarCodigo() {
+    const codigo = document.getElementById("codigo").value;
+
+    if (!codigo) {
+        mostrarToast("Nada para copiar");
+        return;
+    }
+
+    navigator.clipboard.writeText(codigo);
+    somClique();
+    mostrarToast("Código copiado ✔");
+}
+
+function copiarDescricao() {
+    const descricao = document.getElementById("output").innerText;
+
+    if (!descricao) {
+        mostrarToast("Nada para copiar");
+        return;
+    }
+
+    navigator.clipboard.writeText(descricao);
+    somClique();
+    mostrarToast("Descrição copiada ✔");
+}
+
+window.onload = function() {
+    atualizarDataHora();
+    setInterval(atualizarDataHora, 1000);
+    document.getElementById("limite").value = 0;
+    atualizarEstadoCamposVia();
+    atualizarVelocidadePermitida();
+    controlarCamposRadar();
+    gerar();
+};
+
+document.getElementById("tipoVeiculo").addEventListener("change", gerar);
+document.getElementById("localidade").addEventListener("change", gerar);
+document.getElementById("estrada").addEventListener("change", gerar);
+document.getElementById("entrePlacas").addEventListener("change", gerar);
+document.getElementById("radar").addEventListener("change", gerar);
+document.getElementById("tipoVerificacao").addEventListener("change", gerar);
+document.getElementById("ficheiro").addEventListener("input", gerar);
+document.getElementById("foto").addEventListener("input", gerar);
+document.getElementById("vel_reg").addEventListener("input", gerar);
+document.getElementById("operador").addEventListener("change", gerar);
+document.getElementById("limite").addEventListener("input", gerar);
+</script>
+</body>
+</html>
